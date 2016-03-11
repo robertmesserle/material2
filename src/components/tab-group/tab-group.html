@@ -1,0 +1,24 @@
+<div class="md-tab-header" role="tablist"
+    (keydown.arrowRight)="nextTab()"
+    (keydown.arrowLeft)="previousTab()"
+    (keydown.enter)="selectedIndex = focusIndex">
+  <div class="md-tab-label" role="tab" md-tab-label-wrapper
+       *ngFor="#label of labels; #i = index"
+       [attr.id]="getTabLabelId(i)"
+       [attr.aria-controls]="getTabContentId(i)"
+       [attr.aria-selected]="selectedIndex == i"
+       [attr.tabindex]="selectedIndex == i ? 0 : -1"
+       [class.md-active]="selectedIndex == i"
+       (click)="selectedIndex = i">
+    <template [portalHost]="label"></template>
+  </div>
+</div>
+<div class="md-tab-body-wrapper">
+  <div class="md-tab-body" md-tab-contents-wrapper
+      *ngFor="#content of contents; #i = index"
+      [class.md-active]="selectedIndex == i"
+      [attr.id]="getTabContentId(i)"
+      [attr.aria-labelledby]="getTabLabelId(i)">
+    <template role="tabpanel" [portalHost]="content" *ngIf="selectedIndex == i"></template>
+  </div>
+</div>

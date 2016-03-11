@@ -1,0 +1,10 @@
+<div class="md-tab-header" tabindex="0"
+     (keydown.arrowRight)="nextTab()"
+     (keydown.arrowLeft)="previousTab()">
+  <div class="md-tab-label"
+      *ngFor="#label of labels; #i=index"
+      [class.md-active]="selectedIndex == i"
+      (click)="selectedIndex = i">
+    <template [portalHost]="label"></template>
+  </div>
+</div>
