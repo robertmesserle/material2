@@ -27,13 +27,34 @@ export class MdTabGroup {
   @ViewChildren(MdTabLabelWrapper) labelWrappers: QueryList<MdTabLabelWrapper>;
   @ViewChildren(MdTabContentWrapper) contentWrappers: QueryList<MdTabContentWrapper>;
   
-  @Input() selectedIndex: number = 0;
+  @Input()
+  get selectedIndex(): number {
+    return this._selectedIndex;
+  }
+  set selectedIndex(index: number) {
+    this._selectedIndex = index;
+  }
 
+  private _selectedIndex: number = 0;
   private _focusIndex: number = 0;
   private _groupId: number;
 
   constructor() {
     this._groupId = nextId++;
+  }
+  
+  ngAfterViewInit(): void {
+    
+  }
+
+  /**
+   * Used to tell the ink bar where it should be
+   * @returns {any}
+   */
+  get currentLabelWrapper(): HTMLElement {
+    return this.labelWrappers
+        ? this.labelWrappers.toArray()[this.selectedIndex].elementRef.nativeElement
+        : null;
   }
 
   /**
