@@ -23,6 +23,7 @@ const components = [
   'tabs',
   'toolbar',
   'tooltip',
+  'router-tabs',
 ];
 
 /** Map relative paths to URLs. */

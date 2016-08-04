@@ -1,4 +1,6 @@
 import {Directive, Renderer, ElementRef} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {PortalModule} from '@angular2-material/core/portal/portal-directives';
 
 
 /** The ink-bar is used to display and animate the line underneath the current active tab label. */
@@ -37,3 +39,4 @@ export class MdInkBar {
     return element ? element.offsetWidth + 'px' : '0';
   }
 }
+

@@ -9,17 +9,19 @@ import {
     NgZone,
     EventEmitter,
     QueryList,
-    ContentChildren
+    ContentChildren,
+    ViewEncapsulation,
 } from '@angular/core';
+import {NgIf, NgFor} from '@angular/common';
 import {CommonModule} from '@angular/common';
 import {PortalModule} from '@angular2-material/core/portal/portal-directives';
-import {MdTabLabel} from './tab-label';
-import {MdTabContent} from './tab-content';
-import {MdTabLabelWrapper} from './tab-label-wrapper';
-import {MdInkBar} from './ink-bar';
+import {PortalHostDirective} from '@angular2-material/core/portal/portal-directives';
+import {MdTabLabel} from '../tab-label';
+import {MdTabLabelWrapper} from '../tab-label-wrapper';
+import {MdInkBar} from '../ink-bar';
 import {Observable} from 'rxjs/Observable';
+import {Router, RouterLink} from '@angular/router';
 import 'rxjs/add/operator/map';
-import {MdRouterTabs, MdRouterTab} from './router-tabs/router-tabs';
 
 // Due to a bug in the ChromeDriver, Angular 2 keyboard events are not triggered by `sendKeys`
 // during E2E tests when using dot notation such as `(keydown.rightArrow)`. To get around this,
@@ -29,36 +31,29 @@ const RIGHT_ARROW = 39;
 const LEFT_ARROW = 37;
 const ENTER = 13;
 
+/** A simple change event emitted on focus or selection changes. */
+export class MdRouterTabChangeEvent {
+  index: number;
+  tab: MdRouterTab;
+}
+
 /** Used to generate unique ID's for each tab component */
 let nextId = 0;
 
-/** A simple change event emitted on focus or selection changes. */
-export class MdTabChangeEvent {
-  index: number;
-  tab: MdTab;
-}
-
 @Directive({
-  selector: 'md-tab'
+  selector: '[md-router-tab]'
 })
-export class MdTab {
-  @ContentChild(MdTabLabel) label: MdTabLabel;
-  @ContentChild(MdTabContent) content: MdTabContent;
-}
+export class MdRouterTab {}
 
-/**
- * Material design tab-group component.  Supports basic tab pairs (label + content) and includes
- * animated ink-bar, keyboard navigation, and screen reader.
- * See: https://www.google.com/design/spec/components/tabs.html
- */
 @Component({
   moduleId: module.id,
-  selector: 'md-tab-group',
-  templateUrl: 'tab-group.html',
-  styleUrls: ['tab-group.css'],
+  selector: 'md-router-tabs',
+  templateUrl: 'router-tabs.html',
+  styleUrls: ['router-tabs.css'],
+  encapsulation: ViewEncapsulation.None,
 })
-export class MdTabGroup {
-  @ContentChildren(MdTab) _tabs: QueryList<MdTab>;
+export class MdRouterTabs {
+  @ContentChildren(MdRouterTab) _tabs: QueryList<MdRouterTab>;
 
   @ViewChildren(MdTabLabelWrapper) _labelWrappers: QueryList<MdTabLabelWrapper>;
   @ViewChildren(MdInkBar) _inkBar: QueryList<MdInkBar>;
@@ -85,13 +80,15 @@ export class MdTabGroup {
     return this.selectChange.map(event => event.index);
   }
 
-  private _onFocusChange: EventEmitter<MdTabChangeEvent> = new EventEmitter<MdTabChangeEvent>();
-  @Output('focusChange') get focusChange(): Observable<MdTabChangeEvent> {
+  private _onFocusChange: EventEmitter<MdRouterTabChangeEvent> =
+      new EventEmitter<MdRouterTabChangeEvent>();
+  @Output('focusChange') get focusChange(): Observable<MdRouterTabChangeEvent> {
     return this._onFocusChange.asObservable();
   }
 
-  private _onSelectChange: EventEmitter<MdTabChangeEvent> = new EventEmitter<MdTabChangeEvent>();
-  @Output('selectChange') get selectChange(): Observable<MdTabChangeEvent> {
+  private _onSelectChange: EventEmitter<MdRouterTabChangeEvent> =
+      new EventEmitter<MdRouterTabChangeEvent>();
+  @Output('selectChange') get selectChange(): Observable<MdRouterTabChangeEvent> {
     return this._onSelectChange.asObservable();
   }
 
@@ -102,12 +99,18 @@ export class MdTabGroup {
     this._groupId = nextId++;
   }
 
+  ngAfterViewInit() {
+    console.log('init');
+    debugger;
+  }
+
   /**
    * Waits one frame for the view to update, then upates the ink bar
    * Note: This must be run outside of the zone or it will create an infinite change detection loop
    * TODO: internal
    */
   ngAfterViewChecked(): void {
+    console.log('view checked');
     this._zone.runOutsideAngular(() => {
       window.requestAnimationFrame(() => {
         this._updateInkBar();
@@ -149,8 +152,8 @@ export class MdTabGroup {
     }
   }
 
-  private _createChangeEvent(index: number): MdTabChangeEvent {
-    const event = new MdTabChangeEvent;
+  private _createChangeEvent(index: number): MdRouterTabChangeEvent {
+    const event = new MdRouterTabChangeEvent;
     event.index = index;
     if (this._tabs && this._tabs.length) {
       event.tab = this._tabs.toArray()[index];
@@ -196,14 +199,3 @@ export class MdTabGroup {
     }
   }
 }
-
-export const MD_TABS_DIRECTIVES = [MdTabGroup, MdTabLabel, MdTabContent, MdTab, MdRouterTabs,
-    MdRouterTab, MdInkBar];
-export const TABS_INTERNAL_DIRECTIVES = [MdTabLabelWrapper];
-
-@NgModule({
-  imports: [CommonModule, PortalModule],
-  exports: [MD_TABS_DIRECTIVES],
-  declarations: [MD_TABS_DIRECTIVES, TABS_INTERNAL_DIRECTIVES],
-})
-export class MdTabsModule { }

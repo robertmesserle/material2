@@ -1,0 +1,12 @@
+<h1>Router Tabs Demo</h1>
+
+<div class="demo-router-tabs">
+  <md-router-tabs>
+    <a md-router-tab [routerLink]="['first-tab']">One</a>
+    <a md-router-tab [routerLink]="['second-tab']">Two</a>
+  </md-router-tabs>
+
+  <div class="body">
+    <router-outlet></router-outlet>
+  </div>
+</div>
